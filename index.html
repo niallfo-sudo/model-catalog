@@ -94,10 +94,13 @@ async function loadData(){
   const grid = document.getElementById('grid');
   if(grid){ grid.innerHTML = '<div style="padding:16px;color:#cbd5e1">Loading catalog…</div>'; }
   try{
-    const res = await fetch('data.json', {cache:'no-store'});
+    const res = await fetch('./data.json', {cache:'no-store'});
     DATA = await res.json();
-    loadData();
-}catch(e){
+    buildSelectors();
+    buildTOC();
+    state.page=1;
+    render();
+    }catch(e){
     console.error(e);
     document.getElementById('grid').innerHTML = '<div style="padding:16px;color:#cbd5e1">Failed to load data.json. Make sure data.json is in the same folder as this HTML file.</div>';
   }
@@ -292,6 +295,7 @@ els.nextBtn.addEventListener('click',()=>{state.page+=1; render(); window.scroll
 els.clearBtn.addEventListener('click',()=>{state={...state,q:'',cat:'All',sub:'All',page:1}; els.q.value=''; els.catSel.value='All'; rebuildSubSelector(); els.subSel.value='All'; render(); window.scrollTo({top:0,behavior:'smooth'});});
 els.printBtn.addEventListener('click',()=>window.print());
 
-buildSelectors(); buildTOC(); render();
+loadData();
 </script>
 </body></html>
+
