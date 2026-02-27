@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FOZE 3D</title>
 
 <style>
@@ -38,7 +38,6 @@ header{
   padding:12px 18px;
   display:flex;
   align-items:center;
-  gap:12px;
 }
 
 .badge{
@@ -110,11 +109,6 @@ select{
   font-size:12px;
 }
 
-.toc{
-  margin-top:14px;
-  font-size:12px;
-}
-
 details{
   margin-bottom:6px;
   border-radius:10px;
@@ -142,9 +136,7 @@ summary::-webkit-details-marker{display:none}
   cursor:pointer;
 }
 
-.subbtn:hover{
-  color:white;
-}
+.subbtn:hover{color:white}
 
 .main .inner{padding:12px}
 
@@ -225,7 +217,6 @@ summary::-webkit-details-marker{display:none}
   display:flex;
   gap:5px;
   flex-wrap:wrap;
-  overflow:hidden;
   max-height:24px;
 }
 
@@ -239,7 +230,7 @@ summary::-webkit-details-marker{display:none}
 }
 
 .pagination{
-  margin:10px 0;
+  margin:12px 0;
   text-align:center;
 }
 
@@ -250,7 +241,6 @@ summary::-webkit-details-marker{display:none}
   border-radius:10px;
   margin:0 6px;
 }
-
 </style>
 </head>
 
@@ -266,7 +256,7 @@ summary::-webkit-details-marker{display:none}
   <aside class="sidebar panel">
     <div class="inner">
       <div class="search">
-        <input id="q" placeholder="Search title..." />
+        <input id="q" placeholder="Search title...">
       </div>
 
       <div class="filters">
@@ -274,9 +264,7 @@ summary::-webkit-details-marker{display:none}
         <select id="subSelect"></select>
       </div>
 
-      <div class="toc">
-        <div id="toc"></div>
-      </div>
+      <div id="toc"></div>
     </div>
   </aside>
 
@@ -288,13 +276,22 @@ summary::-webkit-details-marker{display:none}
         <button class="btn" onclick="window.print()">Print</button>
       </div>
 
+      <!-- TOP PAGINATION -->
       <div class="pagination">
-        <button class="btn" id="prevBtn">Prev</button>
-        <span class="pagebox" id="pageBox">1</span>
-        <button class="btn" id="nextBtn">Next</button>
+        <button class="btn" id="prevTop">Prev</button>
+        <span class="pagebox" id="pageBoxTop">1</span>
+        <button class="btn" id="nextTop">Next</button>
       </div>
 
       <div id="grid" class="grid"></div>
+
+      <!-- BOTTOM PAGINATION -->
+      <div class="pagination">
+        <button class="btn" id="prevBottom">Prev</button>
+        <span class="pagebox" id="pageBoxBottom">1</span>
+        <button class="btn" id="nextBottom">Next</button>
+      </div>
+
     </div>
   </main>
 </div>
@@ -310,48 +307,61 @@ const catSel = document.getElementById("catSelect");
 const subSel = document.getElementById("subSelect");
 const gridEl = document.getElementById("grid");
 const tocEl = document.getElementById("toc");
-const pageBox = document.getElementById("pageBox");
 
-function norm(s){ return (s ?? "").toString().trim(); }
-function lower(s){ return norm(s).toLowerCase(); }
+const pageTop = document.getElementById("pageBoxTop");
+const pageBottom = document.getElementById("pageBoxBottom");
 
-function getTitle(i){ return norm(i.title); }
-function getCat(i){ return norm(i.category); }
-function getSub(i){ return norm(i.subcategory); }
-function getImg(i){ return norm(i.image_url); }
-function getDrive(i){ return norm(i.drive_link); }
+function norm(s){return (s??"").toString().trim();}
+function lower(s){return norm(s).toLowerCase();}
+function cmp(a,b){return lower(a)<lower(b)?-1:lower(a)>lower(b)?1:0;}
 
-function cmp(a,b){ return lower(a) < lower(b) ? -1 : lower(a) > lower(b) ? 1 : 0; }
+function getTitle(i){return norm(i.title);}
+function getCat(i){return norm(i.category);}
+function getSub(i){return norm(i.subcategory);}
+function getImg(i){return norm(i.image_url);}
+function getDrive(i){return norm(i.drive_link);}
 
 function sortAll(){
   all.sort((a,b)=>{
-    let c = cmp(getCat(a),getCat(b));
+    let c=cmp(getCat(a),getCat(b));
     if(c) return c;
-    c = cmp(getSub(a),getSub(b));
+    c=cmp(getSub(a),getSub(b));
     if(c) return c;
     return cmp(getTitle(a),getTitle(b));
   });
 }
 
+function buildDropdowns(){
+  const cats=[...new Set(all.map(getCat))].sort(cmp);
+  catSel.innerHTML="<option value=''>All</option>";
+  cats.forEach(c=>catSel.innerHTML+=`<option>${c}</option>`);
+  updateSub();
+}
+
+function updateSub(){
+  const cat=catSel.value;
+  const subs=[...new Set(all.filter(i=>!cat||getCat(i)==cat).map(getSub))].sort(cmp);
+  subSel.innerHTML="<option value=''>All</option>";
+  subs.forEach(s=>subSel.innerHTML+=`<option>${s}</option>`);
+}
+
 function buildTOC(){
-  const map = {};
+  const map={};
   all.forEach(i=>{
-    const c = getCat(i)||"Other";
-    const s = getSub(i)||"Other";
+    const c=getCat(i)||"Other";
+    const s=getSub(i)||"Other";
     if(!map[c]) map[c]=new Set();
     map[c].add(s);
   });
 
-  const cats = Object.keys(map).sort(cmp);
-  tocEl.innerHTML="";
-  cats.forEach(c=>{
-    const d = document.createElement("details");
-    const s = document.createElement("summary");
+  Object.keys(map).sort(cmp).forEach(c=>{
+    const d=document.createElement("details");
+    const s=document.createElement("summary");
     s.textContent=c;
     d.appendChild(s);
 
     [...map[c]].sort(cmp).forEach(sub=>{
-      const b = document.createElement("button");
+      const b=document.createElement("button");
       b.className="subbtn";
       b.textContent=sub;
       b.onclick=()=>{
@@ -364,24 +374,6 @@ function buildTOC(){
     });
 
     tocEl.appendChild(d);
-  });
-}
-
-function buildDropdowns(){
-  const cats=[...new Set(all.map(getCat))].sort(cmp);
-  catSel.innerHTML="<option value=''>All</option>";
-  cats.forEach(c=>{
-    catSel.innerHTML+=`<option>${c}</option>`;
-  });
-  updateSub();
-}
-
-function updateSub(){
-  const cat=catSel.value;
-  const subs=[...new Set(all.filter(i=>!cat||getCat(i)==cat).map(getSub))].sort(cmp);
-  subSel.innerHTML="<option value=''>All</option>";
-  subs.forEach(s=>{
-    subSel.innerHTML+=`<option>${s}</option>`;
   });
 }
 
@@ -405,7 +397,8 @@ function applyFilters(){
 function render(){
   const max=Math.ceil(filtered.length/PAGE_SIZE)||1;
   page=Math.min(page,max);
-  pageBox.textContent=page;
+  pageTop.textContent=page;
+  pageBottom.textContent=page;
 
   gridEl.innerHTML="";
   filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(i=>{
@@ -449,8 +442,12 @@ function render(){
   });
 }
 
-document.getElementById("prevBtn").onclick=()=>{page--;render();};
-document.getElementById("nextBtn").onclick=()=>{page++;render();};
+document.getElementById("prevTop").onclick=
+document.getElementById("prevBottom").onclick=()=>{page--;render();};
+
+document.getElementById("nextTop").onclick=
+document.getElementById("nextBottom").onclick=()=>{page++;render();};
+
 document.getElementById("clearBtn").onclick=()=>{
   qEl.value="";
   catSel.value="";
