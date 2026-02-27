@@ -1,420 +1,685 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>3D Models Catalog</title>
-<style>
-:root{
-  --bg:#0b0f14; --panel:rgba(255,255,255,.06); --panel2:rgba(255,255,255,.09);
-  --border:rgba(255,255,255,.12); --text:#e8eef7; --muted:#9fb0c3; --accent:#22c55e;
-  --shadow:0 12px 34px rgba(0,0,0,.45);
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  color:var(--text);
-  background:
-    radial-gradient(1200px 700px at 10% 5%, rgba(34,197,94,.14), transparent 60%),
-    radial-gradient(1200px 700px at 90% 10%, rgba(59,130,246,.12), transparent 60%),
-    var(--bg);
-}
-a{color:inherit; text-decoration:none}
-.header{
-  position:sticky; top:0; z-index:10;
-  background:rgba(11,15,20,.75); backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);
-}
-.header-inner{
-  max-width:1400px; margin:0 auto; padding:12px 14px;
-  display:flex; align-items:center; gap:12px; justify-content:space-between;
-}
-.brand{display:flex; align-items:center; gap:10px; font-weight:700}
-.pill{font-size:12px; padding:5px 10px; border:1px solid rgba(34,197,94,.35); border-radius:999px; background:rgba(34,197,94,.10); color:var(--text)}
-.kpis{display:flex; gap:14px; flex-wrap:wrap; color:var(--muted); font-size:12px}
-.kpis strong{color:var(--text)}
-.wrap{max-width:1400px; margin:0 auto; padding:14px; display:grid; grid-template-columns:330px 1fr; gap:14px}
-@media (max-width:980px){.wrap{grid-template-columns:1fr}.sidebar{position:relative; top:auto; height:auto}}
-.panel{background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow)}
-.sidebar{position:sticky; top:74px; height:calc(100vh - 90px); overflow:auto}
-.sidebar .inner{padding:12px}
-.row{display:flex; gap:8px; align-items:center}
-.search{width:100%; padding:10px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(0,0,0,.20); color:var(--text); outline:none}
-.select{width:100%; padding:10px 10px; border-radius:12px; border:1px solid var(--border); background:rgba(0,0,0,.20); color:var(--text); outline:none}
-.section-title{margin:12px 0 8px; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}
-.toc{display:flex; flex-direction:column; gap:8px; padding-bottom:10px}
-.cat{
-  border:1px solid var(--border); border-radius:14px; background:rgba(0,0,0,.18);
-  overflow:hidden;
-}
-.cat-head{
-  padding:10px 10px; display:flex; justify-content:space-between; align-items:center;
-  cursor:pointer; user-select:none;
-}
-.cat-head:hover{background:rgba(255,255,255,.04)}
-.badge{font-size:11px; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:2px 8px; background:rgba(255,255,255,.04)}
-.subs{display:none; padding:6px 6px 10px}
-.subs.open{display:block}
-.sub{
-  padding:8px 8px; display:flex; justify-content:space-between; align-items:center;
-  border-radius:12px; cursor:pointer; color:var(--muted);
-}
-.sub:hover{background:rgba(255,255,255,.04); color:var(--text)}
-.sub.active{background:rgba(34,197,94,.12); color:var(--text); border:1px solid rgba(34,197,94,.35)}
-.main .inner{padding:14px}
-.controls{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:10px}
-.btn{
-  border:1px solid var(--border); background:rgba(255,255,255,.06); color:var(--text);
-  padding:9px 12px; border-radius:12px; cursor:pointer; font-size:13px;
-}
-.btn:hover{background:rgba(255,255,255,.10)}
-.note{color:var(--muted); font-size:12px}
-.grid{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
-@media (max-width:1250px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:780px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:520px){.grid{grid-template-columns:1fr}}
-.card{
-  border:1px solid var(--border); border-radius:14px; overflow:hidden;
-  background:rgba(0,0,0,.18); display:flex; flex-direction:column; min-height:175px;
-}
-.thumb{aspect-ratio:4/3; background:rgba(255,255,255,.04); position:relative}
-.thumb img{width:100%; height:100%; object-fit:cover; display:block}
-.thumb .noimg{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-size:12px; color:var(--muted)
-}
-.card-body{padding:10px; display:flex; flex-direction:column; gap:6px}
-.title{font-size:13px; font-weight:650; line-height:1.2; max-height:3.2em; overflow:hidden}
-.meta{font-size:11px; color:var(--muted); display:flex; gap:6px; flex-wrap:wrap}
-.tag{border:1px solid var(--border); padding:2px 8px; border-radius:999px; background:rgba(255,255,255,.04)}
-.pager{display:flex; gap:8px; align-items:center; justify-content:center; margin-top:12px}
-.pager .page{min-width:48px; text-align:center; padding:8px 10px; border:1px solid var(--border); border-radius:12px; background:rgba(0,0,0,.14)}
-.error{margin:10px 0; padding:10px 12px; border-radius:14px; border:1px solid rgba(239,68,68,.35); background:rgba(239,68,68,.10); color:#ffd5d5; font-size:13px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3D Models Catalog</title>
+  <style>
+    :root{
+      --bg:#0b0e14;
+      --panel:#111827;
+      --panel2:#0f172a;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --accent:#22c55e;
+      --chip:rgba(255,255,255,.06);
+      --chipBorder:rgba(255,255,255,.10);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% 0%, rgba(34,197,94,.12), transparent 60%),
+        radial-gradient(1200px 800px at 100% 30%, rgba(59,130,246,.10), transparent 60%),
+        var(--bg);
+    }
+    a{color:inherit;text-decoration:none}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(11,14,20,.82);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--border);
+    }
+    .header-inner{
+      max-width:1400px;
+      margin:0 auto;
+      padding:10px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .badge{
+      font-size:12px;
+      padding:4px 10px;
+      border:1px solid rgba(34,197,94,.25);
+      background:rgba(34,197,94,.12);
+      border-radius:999px;
+      font-weight:900;
+    }
+
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:14px;
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:14px;
+    }
+    @media (max-width:980px){
+      .wrap{grid-template-columns:1fr}
+      .sidebar{position:relative;top:auto;height:auto}
+    }
+
+    .panel{
+      background:linear-gradient(180deg, rgba(17,24,39,.96), rgba(15,23,42,.92));
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+    }
+
+    /* Sidebar */
+    .sidebar{
+      position:sticky;
+      top:62px;
+      height:calc(100vh - 76px);
+      overflow:auto;
+    }
+    .sidebar .inner{padding:12px}
+    .search{
+      display:flex;gap:8px;align-items:center;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      border-radius:12px;
+      padding:8px 10px;
+    }
+    .search input{
+      width:100%;
+      border:none;outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:13px;
+    }
+    .filters{
+      display:flex;gap:8px;margin-top:10px;
+    }
+    select{
+      width:100%;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      border-radius:12px;
+      padding:8px 10px;
+      font-size:13px;
+      outline:none;
+    }
+    .toc{
+      margin-top:12px;
+      padding-top:10px;
+      border-top:1px solid var(--border);
+    }
+    .toc h3{
+      margin:0 0 8px 0;
+      font-size:12px;
+      letter-spacing:.12em;
+      color:var(--muted);
+      font-weight:900;
+    }
+    .toc .tip{
+      margin:0 0 10px 0;
+      font-size:12px;
+      color:var(--muted);
+    }
+    details{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      margin-bottom:8px;
+      overflow:hidden;
+      background:rgba(255,255,255,.03);
+    }
+    summary{
+      cursor:pointer;
+      padding:9px 10px;
+      list-style:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:900;
+      font-size:13px;
+    }
+    summary::-webkit-details-marker{display:none}
+    .sublist{padding:6px 8px 10px 8px}
+    .subbtn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      padding:8px 10px;
+      margin:6px 0;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.10);
+      color:var(--text);
+      cursor:pointer;
+      font-size:12.5px;
+      text-align:left;
+    }
+    .subbtn:hover{background:rgba(255,255,255,.06)}
+    .subbtn.active{
+      border-color:rgba(34,197,94,.35);
+      background:rgba(34,197,94,.10);
+    }
+
+    /* Main */
+    .main .inner{padding:12px}
+    .controls{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:13px;
+      font-weight:800;
+    }
+    .btn:hover{background:rgba(255,255,255,.10)}
+    .hint{
+      margin-left:auto;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:10px;
+      align-items:stretch;
+    }
+    @media (max-width:1250px){.grid{grid-template-columns:repeat(3, minmax(0,1fr))}}
+    @media (max-width:900px){.grid{grid-template-columns:repeat(2, minmax(0,1fr))}}
+    @media (max-width:520px){.grid{grid-template-columns:1fr}}
+
+    /* ===== SAME-SIZE CARDS ===== */
+    .card{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:14px;
+      overflow:hidden;
+      background:rgba(0,0,0,.16);
+      display:flex;
+      flex-direction:column;
+      height:300px;            /* fixed card height (uniform) */
+    }
+    .thumb{
+      position:relative;
+      background:rgba(255,255,255,.06);
+      aspect-ratio:4/3;        /* fixed image box ratio */
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .thumb .noimg{
+      position:absolute; inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .card-body{
+      padding:8px 10px 10px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      flex:1 1 auto;
+      min-height:0;
+    }
+    .title{
+      font-size:13.5px;
+      font-weight:900;
+      line-height:1.25;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      min-height:2.6em;        /* reserve space so all align */
+    }
+    .meta{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      align-content:flex-start;
+      overflow:hidden;
+      min-height:28px;         /* reserve chip row */
+      max-height:28px;         /* keep same size even if many chips */
+    }
+    .chip{
+      font-size:11.5px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid var(--chipBorder);
+      background:var(--chip);
+      color:var(--muted);
+      line-height:1;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .clickable{cursor:pointer}
+    .clickable:hover .title{color:#fff; text-decoration:underline}
+
+    .pagination{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin:12px 0 2px 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .pagebox{
+      width:60px;
+      text-align:center;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:6px 8px;
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      font-weight:900;
+    }
+    .err{
+      padding:10px 12px;
+      margin:10px 0;
+      border:1px solid rgba(239,68,68,.30);
+      background:rgba(239,68,68,.10);
+      border-radius:12px;
+      color:#fecaca;
+      font-size:13px;
+      display:none;
+    }
+  </style>
 </head>
+
 <body>
-<div class="header">
+<header>
   <div class="header-inner">
     <div class="brand">
-      <span class="pill">Catalog</span>
+      <span class="badge">Catalog</span>
       <span>3D Models – Category / Subcategory</span>
     </div>
-    <div class="kpis">
-      <span>Total items: <strong id="kpiTotal">0</strong></span>
-      <span>Shown: <strong id="kpiShown">0</strong></span>
-      <span>Page: <strong id="kpiPage">1</strong></span>
-    </div>
+    <!-- totals removed -->
   </div>
-</div>
+</header>
 
 <div class="wrap">
-  <div class="panel sidebar">
+  <aside class="sidebar panel">
     <div class="inner">
-      <input id="search" class="search" placeholder="Search title / model id..." />
-      <div class="row" style="margin-top:10px">
-        <select id="catSel" class="select"></select>
-        <select id="subSel" class="select"></select>
+      <div class="search">
+        <input id="q" type="text" placeholder="Search title / model id..." />
+      </div>
+      <div class="filters">
+        <select id="catSelect"></select>
+        <select id="subSelect"></select>
       </div>
 
-      <div class="section-title">Table of contents</div>
-      <div id="toc" class="toc"></div>
+      <div class="toc">
+        <h3>TABLE OF CONTENTS</h3>
+        <p class="tip">Tip: Click a subcategory to jump + filter.</p>
+        <div id="toc"></div>
+      </div>
     </div>
-  </div>
+  </aside>
 
-  <div class="panel main">
+  <main class="main panel">
     <div class="inner">
       <div class="controls">
-        <div class="row">
-          <button id="btnClear" class="btn">Clear filters</button>
-          <button id="btnPrint" class="btn">Print / Save as PDF</button>
-        </div>
-        <div class="note">Click image or title to open the corresponding <b>drive_link</b>.</div>
+        <button class="btn" id="clearBtn">Clear filters</button>
+        <button class="btn" id="printBtn">Print / Save as PDF</button>
+        <div class="hint">Click image or title to open the corresponding drive_link.</div>
       </div>
 
-      <div id="errorBox" class="error" style="display:none"></div>
+      <div class="err" id="errBox"></div>
+
+      <div class="pagination">
+        <button class="btn" id="prevBtn">Prev</button>
+        <span>Page</span>
+        <span class="pagebox" id="pageBox">1</span>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+
       <div id="grid" class="grid"></div>
-
-      <div class="pager">
-        <button id="prev" class="btn">Prev</button>
-        <div class="page">Page <span id="pageNum">1</span> / <span id="pageMax">1</span></div>
-        <button id="next" class="btn">Next</button>
-      </div>
     </div>
-  </div>
+  </main>
 </div>
 
 <script>
 (() => {
-  const ALL = "ALL";
-  const PAGE_SIZE = 48;
+  const PAGE_SIZE = 96;
 
-  const el = (id) => document.getElementById(id);
-  const kpiTotal = el("kpiTotal");
-  const kpiShown = el("kpiShown");
-  const kpiPage = el("kpiPage");
-  const search = el("search");
-  const catSel = el("catSel");
-  const subSel = el("subSel");
-  const tocEl = el("toc");
-  const grid = el("grid");
-  const errorBox = el("errorBox");
-  const pageNum = el("pageNum");
-  const pageMax = el("pageMax");
+  const qEl = document.getElementById('q');
+  const catSel = document.getElementById('catSelect');
+  const subSel = document.getElementById('subSelect');
+  const tocEl = document.getElementById('toc');
+  const gridEl = document.getElementById('grid');
+  const pageBox = document.getElementById('pageBox');
+  const errBox = document.getElementById('errBox');
 
-  let DATA = null;
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const printBtn = document.getElementById('printBtn');
+
+  let all = [];
   let filtered = [];
   let page = 1;
 
-  function dataUrl(){
-    // Works for /model-catalog/ and /model-catalog/index.html
-    return new URL("data.json", window.location.href).toString();
+  function norm(s){ return (s ?? '').toString().trim(); }
+  function lower(s){ return norm(s).toLowerCase(); }
+
+  function showErr(msg){
+    errBox.style.display = msg ? 'block' : 'none';
+    errBox.textContent = msg || '';
   }
 
-  function showError(msg){
-    errorBox.style.display = "block";
-    errorBox.textContent = msg;
-  }
-  function clearError(){
-    errorBox.style.display = "none";
-    errorBox.textContent = "";
-  }
+  // field name fallbacks
+  function getTitle(it){ return norm(it.title || it.name || it.model_title || it.ModelTitle); }
+  function getCategory(it){ return norm(it.category || it.Category || it.primary_category || it.main_category); }
+  function getSubcategory(it){ return norm(it.subcategory || it.Subcategory || it.secondary_category || it.sub_category); }
+  function getThumb(it){ return norm(it.image_url || it.thumbnail_url || it.thumb || it.thumbnail || it.image || it.ImageUrl); }
+  function getDrive(it){ return norm(it.drive_link || it.drive || it.url || it.zip_url || it.DriveLink); }
+  function getModelId(it){ return norm(it.model_id || it.ModelID || it.id || it.ID); }
 
-  function normalize(s){ return (s || "").toString().toLowerCase(); }
-
-  function buildSelects(){
-    const cats = Object.keys(DATA.toc || {});
-    catSel.innerHTML = "";
-    subSel.innerHTML = "";
-
-    const optAll = document.createElement("option");
-    optAll.value = ALL; optAll.textContent = "All";
-    catSel.appendChild(optAll);
-
-    for (const c of cats){
-      const o = document.createElement("option");
-      o.value = c; o.textContent = c;
-      catSel.appendChild(o);
-    }
-
-    const optAll2 = document.createElement("option");
-    optAll2.value = ALL; optAll2.textContent = "All";
-    subSel.appendChild(optAll2);
+  // robust alphabetical compare (case-insensitive)
+  function cmpText(a,b){
+    const A = lower(a), B = lower(b);
+    if(A < B) return -1;
+    if(A > B) return 1;
+    return 0;
   }
 
-  function rebuildSubSelect(){
-    subSel.innerHTML = "";
-    const optAll2 = document.createElement("option");
-    optAll2.value = ALL; optAll2.textContent = "All";
-    subSel.appendChild(optAll2);
+  // item sort: Category > Subcategory > Title > ModelID
+  function sortItems(arr){
+    arr.sort((x,y) => {
+      const cx = getCategory(x) || 'Uncategorized';
+      const cy = getCategory(y) || 'Uncategorized';
+      const sc = cmpText(cx, cy);
+      if(sc) return sc;
 
-    const c = catSel.value;
-    if (c === ALL) return;
+      const sx = getSubcategory(x) || 'Other';
+      const sy = getSubcategory(y) || 'Other';
+      const ss = cmpText(sx, sy);
+      if(ss) return ss;
 
-    const subs = Object.keys(DATA.toc[c] || {});
-    for (const s of subs){
-      const o = document.createElement("option");
-      o.value = s; o.textContent = s;
-      subSel.appendChild(o);
-    }
+      const tx = getTitle(x) || '';
+      const ty = getTitle(y) || '';
+      const st = cmpText(tx, ty);
+      if(st) return st;
+
+      const ix = getModelId(x) || '';
+      const iy = getModelId(y) || '';
+      return cmpText(ix, iy);
+    });
+    return arr;
+  }
+
+  function uniqSorted(arr){
+    return [...new Set(arr.filter(Boolean))].sort((a,b)=>cmpText(a,b));
+  }
+
+  function buildDropdowns(){
+    const cats = uniqSorted(all.map(getCategory));
+    catSel.innerHTML = `<option value="">All</option>` + cats.map(c=>`<option>${escapeHtml(c)}</option>`).join('');
+    updateSubDropdown();
+  }
+
+  function updateSubDropdown(){
+    const cat = catSel.value;
+    const subs = uniqSorted(all
+      .filter(it => !cat || getCategory(it) === cat)
+      .map(getSubcategory)
+    );
+    subSel.innerHTML = `<option value="">All</option>` + subs.map(s=>`<option>${escapeHtml(s)}</option>`).join('');
   }
 
   function buildTOC(){
-    tocEl.innerHTML = "";
-    const entries = Object.entries(DATA.toc || {});
-    for (const [cat, subMap] of entries){
-      const total = Object.values(subMap).reduce((a,b)=>a+b,0);
+    // Category -> Set(Subcategories)
+    const map = new Map();
+    for(const it of all){
+      const c = getCategory(it) || 'Uncategorized';
+      const s = getSubcategory(it) || 'Other';
+      if(!map.has(c)) map.set(c, new Set());
+      map.get(c).add(s);
+    }
 
-      const wrap = document.createElement("div");
-      wrap.className = "cat";
+    const cats = [...map.keys()].sort((a,b)=>cmpText(a,b)); // alphabetical
+    tocEl.innerHTML = '';
 
-      const head = document.createElement("div");
-      head.className = "cat-head";
-      head.innerHTML = `<span>${escapeHtml(cat)}</span><span class="badge">${total.toLocaleString()}</span>`;
+    for(const c of cats){
+      const det = document.createElement('details');
+      const sum = document.createElement('summary');
+      sum.innerHTML = `<span>${escapeHtml(c)}</span><span style="opacity:.55">▾</span>`;
+      det.appendChild(sum);
 
-      const subs = document.createElement("div");
-      subs.className = "subs";
+      const box = document.createElement('div');
+      box.className = 'sublist';
 
-      head.addEventListener("click", () => subs.classList.toggle("open"));
+      const subs = [...map.get(c)].sort((a,b)=>cmpText(a,b)); // alphabetical
+      for(const s of subs){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'subbtn';
+        b.textContent = s;
 
-      for (const [sub, count] of Object.entries(subMap)){
-        const row = document.createElement("div");
-        row.className = "sub";
-        row.innerHTML = `<span>${escapeHtml(sub)}</span><span class="badge">${count.toLocaleString()}</span>`;
-        row.addEventListener("click", () => {
-          catSel.value = cat;
-          rebuildSubSelect();
-          subSel.value = sub;
-          applyFilters(true);
-          // highlight
-          [...tocEl.querySelectorAll(".sub")].forEach(x=>x.classList.remove("active"));
-          row.classList.add("active");
-          subs.classList.add("open");
+        b.addEventListener('click', () => {
+          catSel.value = c;
+          updateSubDropdown();
+          subSel.value = s;
+          page = 1;
+          applyFilters();
+
+          document.querySelectorAll('.subbtn').forEach(x=>x.classList.remove('active'));
+          b.classList.add('active');
+
+          gridEl.scrollIntoView({behavior:'smooth', block:'start'});
         });
-        subs.appendChild(row);
+
+        box.appendChild(b);
       }
 
-      wrap.appendChild(head);
-      wrap.appendChild(subs);
-      tocEl.appendChild(wrap);
+      det.appendChild(box);
+      tocEl.appendChild(det);
     }
   }
 
-  function escapeHtml(str){
-    return (str || "").toString()
-      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;").replaceAll("'","&#39;");
-  }
-
-  function applyFilters(resetPage){
-    if (!DATA) return;
-    clearError();
-
-    const q = normalize(search.value).trim();
+  function applyFilters(){
+    const q = lower(qEl.value);
     const cat = catSel.value;
     const sub = subSel.value;
 
-    filtered = DATA.items.filter(it => {
-      if (cat !== ALL && it.category !== cat) return false;
-      if (sub !== ALL && it.subcategory !== sub) return false;
-      if (!q) return true;
-      const hay = normalize(it.title) + " " + normalize(it.model_id);
-      return hay.includes(q);
+    filtered = all.filter(it => {
+      const t = lower(getTitle(it));
+      const mid = lower(getModelId(it));
+      const c = getCategory(it);
+      const s = getSubcategory(it);
+
+      if(cat && c !== cat) return false;
+      if(sub && s !== sub) return false;
+      if(q && !(t.includes(q) || mid.includes(q))) return false;
+
+      return true;
     });
 
-    if (resetPage) page = 1;
-
-    // If a specific cat/sub yields zero, auto-fallback to ALL/ALL on first load
-    if (filtered.length === 0 && (cat !== ALL || sub !== ALL) && !q){
-      catSel.value = ALL;
-      rebuildSubSelect();
-      subSel.value = ALL;
-      filtered = DATA.items.slice();
-      page = 1;
-    }
+    // ensure items alphabetical (Title, then ModelID) inside current filter
+    filtered.sort((x,y) => {
+      const tx = getTitle(x) || '';
+      const ty = getTitle(y) || '';
+      const st = cmpText(tx, ty);
+      if(st) return st;
+      const ix = getModelId(x) || '';
+      const iy = getModelId(y) || '';
+      return cmpText(ix, iy);
+    });
 
     render();
   }
 
-  function openLink(it){
-    const link = (it.drive_link || "").trim();
-    if (link){
-      window.open(link, "_blank", "noopener");
-    } else {
-      // fallback: open source url if drive link missing
-      if (it.url) window.open(it.url, "_blank", "noopener");
-    }
-  }
-
   function render(){
-    const total = DATA.items.length;
-    const shown = filtered.length;
+    const maxPage = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    page = Math.min(page, maxPage);
+    pageBox.textContent = String(page);
 
-    kpiTotal.textContent = total.toLocaleString();
-    kpiShown.textContent = shown.toLocaleString();
+    const start = (page - 1) * PAGE_SIZE;
+    const slice = filtered.slice(start, start + PAGE_SIZE);
 
-    const maxPage = Math.max(1, Math.ceil(shown / PAGE_SIZE));
-    page = Math.min(Math.max(1, page), maxPage);
-    kpiPage.textContent = page.toString();
-    pageNum.textContent = page.toString();
-    pageMax.textContent = maxPage.toString();
+    gridEl.innerHTML = '';
+    for(const it of slice){
+      const title = getTitle(it) || 'Untitled';
+      const cat = getCategory(it) || '';
+      const sub = getSubcategory(it) || '';
+      const thumb = getThumb(it);
+      const drive = getDrive(it);
 
-    const start = (page-1)*PAGE_SIZE;
-    const slice = filtered.slice(start, start+PAGE_SIZE);
+      const card = document.createElement('div');
+      card.className = 'card clickable';
 
-    grid.innerHTML = "";
-    for (const it of slice){
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const thumb = document.createElement("div");
-      thumb.className = "thumb";
-      if (it.image_url){
-        const img = document.createElement("img");
-        img.src = it.image_url;
-        img.alt = it.title || "thumbnail";
-        img.loading = "lazy";
-        img.addEventListener("click", ()=>openLink(it));
-        img.style.cursor = "pointer";
-        thumb.appendChild(img);
+      const thumbDiv = document.createElement('div');
+      thumbDiv.className = 'thumb';
+      if(thumb){
+        const img = document.createElement('img');
+        img.src = thumb;
+        img.alt = title;
+        img.loading = 'lazy';
+        thumbDiv.appendChild(img);
       } else {
-        const no = document.createElement("div");
-        no.className = "noimg";
-        no.textContent = "No image";
-        thumb.appendChild(no);
+        const noimg = document.createElement('div');
+        noimg.className = 'noimg';
+        noimg.textContent = 'No image';
+        thumbDiv.appendChild(noimg);
       }
 
-      const body = document.createElement("div");
-      body.className = "card-body";
-      const title = document.createElement("div");
-      title.className = "title";
-      title.textContent = it.title || "(untitled)";
-      title.style.cursor = "pointer";
-      title.addEventListener("click", ()=>openLink(it));
+      const body = document.createElement('div');
+      body.className = 'card-body';
 
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      meta.innerHTML = `
-        <span class="tag">${escapeHtml(it.category)}</span>
-        <span class="tag">${escapeHtml(it.subcategory)}</span>
-        ${it.model_id ? `<span class="tag">ID: ${escapeHtml(it.model_id)}</span>` : ``}
-        ${it.drive_link ? `<span class="tag" style="border-color:rgba(34,197,94,.45)">Drive</span>` : `<span class="tag">No drive link</span>`}
-      `;
+      const t = document.createElement('div');
+      t.className = 'title';
+      t.textContent = title;
 
-      body.appendChild(title);
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      if(cat) meta.appendChild(chip(cat));
+      if(sub) meta.appendChild(chip(sub));
+
+      body.appendChild(t);
       body.appendChild(meta);
 
-      card.appendChild(thumb);
+      card.appendChild(thumbDiv);
       card.appendChild(body);
-      grid.appendChild(card);
+
+      card.addEventListener('click', () => {
+        if(drive){
+          window.open(drive, '_blank', 'noopener,noreferrer');
+        }
+      });
+
+      gridEl.appendChild(card);
     }
+
+    prevBtn.disabled = page <= 1;
+    nextBtn.disabled = page >= maxPage;
   }
 
-  async function boot(){
-    try{
-      const res = await fetch(dataUrl(), {cache:"no-store"});
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      DATA = await res.json();
+  function chip(text){
+    const d = document.createElement('span');
+    d.className = 'chip';
+    d.textContent = text;
+    return d;
+  }
 
-      buildSelects();
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  // Events
+  qEl.addEventListener('input', () => { page = 1; applyFilters(); });
+
+  catSel.addEventListener('change', () => {
+    updateSubDropdown();
+    page = 1;
+    applyFilters();
+    document.querySelectorAll('.subbtn').forEach(x=>x.classList.remove('active'));
+  });
+
+  subSel.addEventListener('change', () => {
+    page = 1;
+    applyFilters();
+    document.querySelectorAll('.subbtn').forEach(x=>x.classList.remove('active'));
+  });
+
+  prevBtn.addEventListener('click', () => { page--; render(); });
+  nextBtn.addEventListener('click', () => { page++; render(); });
+
+  clearBtn.addEventListener('click', () => {
+    qEl.value = '';
+    catSel.value = '';
+    updateSubDropdown();
+    subSel.value = '';
+    page = 1;
+    document.querySelectorAll('.subbtn').forEach(x=>x.classList.remove('active'));
+    applyFilters();
+  });
+
+  printBtn.addEventListener('click', () => window.print());
+
+  async function init(){
+    try{
+      showErr('');
+      const res = await fetch('./data.json', {cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+
+      all = Array.isArray(json) ? json : (json.items || json.data || []);
+      if(!Array.isArray(all)) all = [];
+
+      // sort master list alphabetically (Category > Subcategory > Title > ModelID)
+      sortItems(all);
+
+      buildDropdowns();
       buildTOC();
 
-      // Default state: show everything immediately
-      catSel.value = ALL;
-      rebuildSubSelect();
-      subSel.value = ALL;
-      filtered = DATA.items.slice();
+      // default: show everything immediately, alphabetically
+      filtered = all.slice();
+      // additionally keep visible list alphabetical by title in default view
+      filtered.sort((x,y) => {
+        const st = cmpText(getTitle(x)||'', getTitle(y)||'');
+        if(st) return st;
+        return cmpText(getModelId(x)||'', getModelId(y)||'');
+      });
+
       page = 1;
       render();
-    }catch(e){
-      showError("Failed to load data.json. Ensure data.json is in the same folder as index.html. Details: " + e.message);
+    } catch(e){
+      showErr('Failed to load data.json. Confirm it is in the repo root and named exactly "data.json".');
       console.error(e);
     }
   }
 
-  // Events
-  search.addEventListener("input", ()=>applyFilters(true));
-  catSel.addEventListener("change", ()=>{
-    rebuildSubSelect();
-    subSel.value = ALL;
-    applyFilters(true);
-  });
-  subSel.addEventListener("change", ()=>applyFilters(true));
-
-  el("btnClear").addEventListener("click", ()=>{
-    search.value = "";
-    catSel.value = ALL;
-    rebuildSubSelect();
-    subSel.value = ALL;
-    applyFilters(true);
-    [...tocEl.querySelectorAll(".sub")].forEach(x=>x.classList.remove("active"));
-  });
-
-  el("btnPrint").addEventListener("click", ()=>window.print());
-  el("prev").addEventListener("click", ()=>{ page--; render(); });
-  el("next").addEventListener("click", ()=>{ page++; render(); });
-
-  boot();
+  init();
 })();
 </script>
 </body>
