@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>3D Models Catalog</title>
+<style>
+:root{--bg:#0b1120;--panel:#111827;--panel2:#0f172a;--text:#e5e7eb;--muted:#9ca3af;--accent:#22c55e;--border:rgba(255,255,255,.10);--shadow:0 10px 30px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:radial-gradient(1200px 800px at 20% 0%, rgba(34,197,94,.12),transparent 60%),radial-gradient(1200px 800px at 100% 30%, rgba(59,130,246,.10),transparent 60%),var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:10;background:rgba(17,24,39,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;max-width:1400px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.25);border-radius:999px;font-size:12px}
+.kpi{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi strong{color:var(--text)}
+.wrap{max-width:1400px;margin:0 auto;padding:14px 16px;display:grid;grid-template-columns:320px 1fr;gap:14px}
+.panel{background:linear-gradient(180deg, rgba(17,24,39,.90), rgba(15,23,42,.88));border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+.sidebar{position:sticky;top:78px;height:calc(100vh - 92px);overflow:auto}
+.sidebar .inner{padding:12px}
+.search{display:flex;gap:8px;align-items:center;padding:10px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,.15)}
+.search input{width:100%;border:none;outline:none;background:transparent;color:var(--text);font-size:13px}
+.selects{display:flex;gap:8px;margin-top:10px}
+select{width:100%;border:1px solid var(--border);background:rgba(0,0,0,.18);color:var(--text);border-radius:12px;padding:10px;font-size:13px;outline:none}
+.toc{margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+.toc h3{margin:0 0 8px;font-size:13px;color:var(--muted);font-weight:600}
+.toc .cat{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.toc button{width:100%;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,.12);border:none;color:var(--text);padding:10px;cursor:pointer;font-size:13px}
+.toc button:hover{background:rgba(255,255,255,.06)}
+.toc .subs{display:none;flex-direction:column}
+.toc .subs a{display:flex;justify-content:space-between;gap:10px;padding:9px 10px;color:var(--muted);font-size:12px;border-top:1px solid rgba(255,255,255,.06)}
+.toc .subs a:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.main .inner{padding:14px}
+.controls{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+.controls .left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);padding:9px 12px;border-radius:12px;cursor:pointer;font-size:13px}
+.btn:hover{background:rgba(255,255,255,.10)}
+.notice{font-size:12px;color:var(--muted);margin:8px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:1250px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:980px){.wrap{grid-template-columns:1fr}.sidebar{position:relative;top:0;height:auto}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:rgba(0,0,0,.16);min-height:170px;display:flex;flex-direction:column}
+.thumb{position:relative;background:rgba(255,255,255,.04);aspect-ratio:4/3;overflow:hidden;cursor:pointer}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px}
+.card .body{padding:10px 10px 11px;display:flex;flex-direction:column;gap:6px}
+.title{font-size:12.5px;line-height:1.25;max-height:3.75em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;cursor:pointer}
+.meta{display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.04)}
+.pager{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.pager .pill{border:1px solid var(--border);background:rgba(0,0,0,.35);color:var(--text);padding:6px 10px;border-radius:999px;font-size:12px}
+.error{white-space:pre-wrap;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#fecaca;padding:10px;border-radius:12px;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div class="badge">Catalog</div>
+    <div style="font-weight:700">3D Models – Category / Subcategory</div>
+    <div class="kpi">
+      <span>Total items: <strong id="kTotal">—</strong></span>
+      <span>Shown: <strong id="kShown">—</strong></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="panel sidebar">
+    <div class="inner">
+      <div class="search">
+        <input id="q" type="text" placeholder="title contains..." />
+      </div>
+      <div class="selects">
+        <select id="catSel"><option value="__ALL__">All</option></select>
+        <select id="subSel"><option value="__ALL__">All</option></select>
+      </div>
+      <div class="toc" id="toc">
+        <h3>Table of contents</h3>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Tip: Click a TOC subcategory to jump + filter.</div>
+        <div id="tocList"></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="panel main">
+    <div class="inner">
+      <div class="controls">
+        <div class="left">
+          <button class="btn" id="clearBtn">Clear filters</button>
+          <button class="btn" id="printBtn">Print / Save as PDF</button>
+        </div>
+      </div>
+
+      <div class="notice" id="notice"></div>
+      <div id="err" class="error" style="display:none"></div>
+
+      <div class="grid" id="grid"></div>
+
+      <div class="pager">
+        <button class="btn" id="prevBtn">Prev</button>
+        <span class="pill">Page <span id="pageNum">1</span> / <span id="pageMax">1</span></span>
+        <button class="btn" id="nextBtn">Next</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const PAGE_SIZE = 48;
+
+let DATA = null;         // {total,categories,items}
+let FILTERED = [];
+let page = 1;
+
+function norm(s){ return (s||"").toString().trim(); }
+function byId(id){ return document.getElementById(id); }
+
+function computeDataUrl(){
+  // Robust for GitHub Pages (project site), root sites, and local testing.
+  const origin = window.location.origin;
+  let path = window.location.pathname;
+  // Ensure directory path ends with /
+  if(!path.endsWith("/")){
+    path = path.substring(0, path.lastIndexOf("/")+1);
+  }
+  return origin + path + "data.json";
+}
+
+async function loadData(){
+  const status = byId("status");
+  status.textContent = "Loading data…";
+  status.style.display = "block";
+
+  const v = "2026-02-27-2";
+  const base = computeDataUrl();
+  const candidates = [
+    base + "?v=" + v,
+    "./data.json?v=" + v,
+    "data.json?v=" + v
+  ];
+
+  let lastErr = null;
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      const txt = await res.text();
+      let parsed;
+      try {
+        parsed = JSON.parse(txt);
+      } catch (e) {
+        throw new Error(`Invalid JSON in ${url}: ${e.message}`);
+      }
+      if (!parsed || !parsed.items || !Array.isArray(parsed.items)) {
+        throw new Error(`Unexpected shape in ${url} (expected {items:[...]})`);
+      }
+      DATA = parsed;
+      status.textContent = "";
+      status.style.display = "none";
+      return;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+
+  status.textContent = "Failed to load data.json. Please refresh hard (Ctrl+F5). If it still fails, your data.json may be missing or invalid.";
+  status.style.display = "block";
+  console.error("Data load failed:", lastErr);
+  throw lastErr;
+}
+
+function buildSelects(){
+  const catSel = byId("catSel");
+  const subSel = byId("subSel");
+  // categories from DATA.categories (preferred) else derive from items.
+  const cats = Array.isArray(DATA.categories) ? DATA.categories : null;
+
+  // Category options
+  catSel.innerHTML = '<option value="__ALL__">All</option>';
+  const catNames = cats ? cats.map(c=>c.name) : Array.from(new Set(DATA.items.map(it=>it.category))).sort();
+  for(const c of catNames){
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    catSel.appendChild(opt);
+  }
+
+  function fillSubs(){
+    const selectedCat = catSel.value;
+    subSel.innerHTML = '<option value="__ALL__">All</option>';
+
+    let subs;
+    if(cats && selectedCat !== "__ALL__"){
+      const catObj = cats.find(x=>x.name===selectedCat);
+      subs = (catObj && Array.isArray(catObj.subs||catObj.subcategories)) ? (catObj.subs||catObj.subcategories).map(s=>s.name) : null;
+    }
+    if(!subs){
+      const pool = selectedCat==="__ALL__" ? DATA.items : DATA.items.filter(it=>it.category===selectedCat);
+      subs = Array.from(new Set(pool.map(it=>it.subcategory))).sort((a,b)=>a.localeCompare(b));
+    }
+
+    for(const s of subs){
+      const opt = document.createElement("option");
+      opt.value = s;
+      opt.textContent = s;
+      subSel.appendChild(opt);
+    }
+  }
+
+  catSel.addEventListener("change", ()=>{ fillSubs(); page=1; applyFilters(); });
+  subSel.addEventListener("change", ()=>{ page=1; applyFilters(); });
+
+  fillSubs();
+}
+
+function buildTOC(){
+  const tocList = byId("tocList");
+  tocList.innerHTML = "";
+
+  // Build toc from DATA.toc if present, else derive from items.
+  let toc = Array.isArray(DATA.toc) ? DATA.toc : null;
+  if (!toc || toc.length === 0){
+    const catMap = new Map(); // cat -> Map(sub -> count)
+    for (const it of (DATA.items || [])){
+      const c = (it.category || "Uncategorized").trim() || "Uncategorized";
+      const s = (it.subcategory || "General").trim() || "General";
+      if (!catMap.has(c)) catMap.set(c, new Map());
+      const subMap = catMap.get(c);
+      subMap.set(s, (subMap.get(s) || 0) + 1);
+    }
+    toc = Array.from(catMap.entries())
+      .map(([name, subMap]) => ({
+        name,
+        count: Array.from(subMap.values()).reduce((a,b)=>a+b,0),
+        subs: Array.from(subMap.entries()).map(([sn, ct])=>({name: sn, count: ct}))
+      }))
+      .sort((a,b)=>a.name.localeCompare(b.name));
+    for (const c of toc) c.subs.sort((a,b)=>a.name.localeCompare(b.name));
+  }
+
+  for (const cat of toc){
+    const box = document.createElement("div");
+    box.className = "toc cat";
+
+    const header = document.createElement("button");
+    header.className = "toc catbtn";
+    header.type = "button";
+    header.innerHTML = `<span>${escapeHtml(cat.name)}</span><span class="pill">${fmt(cat.count||0)}</span>`;
+
+    const subsWrap = document.createElement("div");
+    subsWrap.className = "toc subs";
+    subsWrap.style.display = "none";
+
+    for (const sub of (cat.subs || [])){
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "toc subbtn";
+      row.innerHTML = `<span>${escapeHtml(sub.name)}</span><span class="pill">${fmt(sub.count||0)}</span>`;
+      row.addEventListener("click", ()=>{
+        byId("catSel").value = cat.name;
+        rebuildSubSelect();
+        byId("subSel").value = sub.name;
+        byId("q").value = "";
+        currentPage = 1;
+        applyFilters();
+        renderGrid();
+        window.scrollTo({top:0, behavior:"smooth"});
+      });
+      subsWrap.appendChild(row);
+    }
+
+    header.addEventListener("click", ()=>{
+      subsWrap.style.display = (subsWrap.style.display === "none") ? "flex" : "none";
+    });
+
+    box.appendChild(header);
+    box.appendChild(subsWrap);
+    tocList.appendChild(box);
+  }
+}
+
+function openBestLink(item){
+  const dl = norm(item.drive_link);
+  const url = norm(item.url);
+  const target = dl && dl !== "nan" ? dl : url;
+  if(target) window.open(target, "_blank", "noopener");
+}
+
+function applyFilters(){
+  const q = norm(byId("q").value).toLowerCase();
+  const cat = byId("catSel").value;
+  const sub = byId("subSel").value;
+
+  FILTERED = DATA.items.filter(it=>{
+    if(cat !== "__ALL__" && norm(it.category) !== cat) return false;
+    if(sub !== "__ALL__" && norm(it.subcategory) !== sub) return false;
+    if(q && !norm(it.title).toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(FILTERED.length / PAGE_SIZE));
+  if(page > totalPages) page = totalPages;
+
+  byId("kTotal").textContent = DATA.total ?? DATA.items.length;
+  byId("kShown").textContent = FILTERED.length;
+  byId("pageNum").textContent = page;
+  byId("pageMax").textContent = totalPages;
+
+  renderPage();
+}
+
+function renderPage(){
+  const grid = byId("grid");
+  grid.innerHTML = "";
+  const start = (page-1)*PAGE_SIZE;
+  const slice = FILTERED.slice(start, start+PAGE_SIZE);
+
+  for(const it of slice){
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const thumb = document.createElement("div");
+    thumb.className = "thumb";
+    const imgUrl = norm(it.image_url);
+
+    if(imgUrl){
+      const img = document.createElement("img");
+      img.loading = "lazy";
+      img.alt = it.title || "model thumbnail";
+      img.src = imgUrl;
+      img.onerror = ()=>{ img.remove(); const fb=document.createElement("div"); fb.className="fallback"; fb.textContent="No image"; thumb.appendChild(fb); };
+      thumb.appendChild(img);
+    }else{
+      const fb = document.createElement("div");
+      fb.className = "fallback";
+      fb.textContent = "No image";
+      thumb.appendChild(fb);
+    }
+    thumb.addEventListener("click", ()=>openBestLink(it));
+    card.appendChild(thumb);
+
+    const body = document.createElement("div");
+    body.className = "body";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.textContent = it.title || "(untitled)";
+    title.title = it.title || "";
+    title.addEventListener("click", ()=>openBestLink(it));
+    body.appendChild(title);
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const t1 = document.createElement("span"); t1.className="tag"; t1.textContent = it.category || "—";
+    const t2 = document.createElement("span"); t2.className="tag"; t2.textContent = it.subcategory || "—";
+    const t3 = document.createElement("span"); t3.className="tag"; t3.textContent = it.model_id ? ("ID: "+it.model_id) : "ID: —";
+    meta.appendChild(t1); meta.appendChild(t2); meta.appendChild(t3);
+    body.appendChild(meta);
+
+    card.appendChild(body);
+    grid.appendChild(card);
+  }
+}
+
+function wireUI(){
+  byId("q").addEventListener("input", ()=>{ page=1; applyFilters(); });
+  byId("clearBtn").addEventListener("click", ()=>{
+    byId("q").value="";
+    byId("catSel").value="__ALL__";
+    byId("catSel").dispatchEvent(new Event("change"));
+    byId("subSel").value="__ALL__";
+    page=1;
+    applyFilters();
+  });
+  byId("printBtn").addEventListener("click", ()=>window.print());
+  byId("prevBtn").addEventListener("click", ()=>{ page=Math.max(1,page-1); applyFilters(); });
+  byId("nextBtn").addEventListener("click", ()=>{
+    const maxP = Math.max(1, Math.ceil(FILTERED.length / PAGE_SIZE));
+    page=Math.min(maxP,page+1);
+    applyFilters();
+  });
+}
+
+(async function init(){
+  wireUI();
+  await loadData();
+  if(!DATA) return;
+  buildSelects();
+  buildTOC();
+  // Force a known-good initial state (some browsers may preserve <select> state from bfcache)
+  byId("q").value = "";
+  byId("catSel").value = "__ALL__";
+  byId("catSel").dispatchEvent(new Event("change"));
+  byId("subSel").value = "__ALL__";
+  page = 1;
+  applyFilters();
+})();
+</script>
+</body>
+</html>
