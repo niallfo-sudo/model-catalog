@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FOZE 3D</title>
+  <style>
+    :root{
+      --bg:#0b0e14;
+      --panel:rgba(17,24,39,.72);
+      --panel2:rgba(15,23,42,.72);
+      --border:rgba(255,255,255,.10);
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#22c55e;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+      --gap:10px; /* tighter */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 800px at 20% 0%, rgba(34,197,94,.14), transparent 60%),
+        radial-gradient(1200px 800px at 100% 40%, rgba(59,130,246,.12), transparent 60%),
+        var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+
+    header{
+      position:sticky;top:0;z-index:10;
+      backdrop-filter: blur(10px);
+      background:rgba(11,14,20,.72);
+      border-bottom:1px solid var(--border);
+    }
+    .header-inner{
+      max-width:1400px;margin:0 auto;
+      padding:12px 14px;
+      display:flex;align-items:center;gap:12px;
+    }
+    .brand{
+      display:inline-flex;align-items:center;gap:10px;
+      font-weight:800;letter-spacing:.2px;
+    }
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:6px 10px;border-radius:999px;
+      background:rgba(34,197,94,.14);
+      border:1px solid rgba(34,197,94,.25);
+      font-size:12px;color:var(--text);
+    }
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:12px 14px 18px;
+      display:grid;
+      grid-template-columns: 340px 1fr;
+      gap:var(--gap);
+    }
+
+    .panel{
+      background:linear-gradient(180deg, rgba(17,24,39,.78), rgba(15,23,42,.65));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .sidebar{
+      position:sticky; top:74px; height:calc(100vh - 92px);
+    }
+    .sidebar .inner{padding:12px}
+    .row{display:flex;gap:8px;align-items:center}
+    .search{
+      width:100%;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      padding:10px 10px;
+      border-radius:12px;
+      outline:none;
+      font-size:13px;
+    }
+    .select{
+      width:100%;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.18);
+      color:var(--text);
+      padding:10px 10px;
+      border-radius:12px;
+      outline:none;
+      font-size:13px;
+    }
+    .toc-title{
+      margin:12px 0 8px;
+      font-size:12px;
+      color:var(--muted);
+      letter-spacing:.6px;
+      text-transform:uppercase;
+    }
+    .toc{
+      margin-top:6px;
+      overflow:auto;
+      height:calc(100vh - 190px);
+      padding-right:6px;
+    }
+    .toc details{
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.12);
+      border-radius:14px;
+      margin-bottom:8px;
+      overflow:hidden;
+    }
+    .toc summary{
+      cursor:pointer;
+      list-style:none;
+      padding:10px 10px;
+      display:flex;align-items:center;justify-content:space-between;
+      gap:10px;
+      user-select:none;
+      font-weight:700;
+      font-size:13px;
+    }
+    .toc summary::-webkit-details-marker{display:none}
+    .toc .subs{
+      padding:0 10px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .toc .subbtn{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      border-radius:999px;
+      padding:7px 10px;
+      font-size:12px;
+      cursor:pointer;
+      text-align:left;
+      color:var(--text);
+    }
+    .toc .subbtn:hover{background:rgba(255,255,255,.07)}
+
+    .main .inner{padding:12px}
+    .controls{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .btn:hover{background:rgba(255,255,255,.10)}
+    .hint{
+      margin-left:auto;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:var(--gap);
+      align-items:stretch;
+    }
+    @media (max-width:1200px){ .wrap{grid-template-columns: 320px 1fr} .grid{grid-template-columns: repeat(3, 1fr)} }
+    @media (max-width:920px){ .wrap{grid-template-columns: 1fr} .sidebar{position:relative;top:auto;height:auto} .toc{height:auto;max-height:320px} .grid{grid-template-columns: repeat(2, 1fr)} }
+    @media (max-width:520px){ .grid{grid-template-columns: 1fr} }
+
+    /* tighter uniform card */
+    .card{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      overflow:hidden;
+      background:rgba(0,0,0,.16);
+      display:flex;
+      flex-direction:column;
+      min-height: 250px; /* uniform */
+    }
+    .thumb{
+      position:relative;
+      background:rgba(255,255,255,.05);
+      aspect-ratio: 4 / 3; /* uniform */
+      overflow:hidden;
+      cursor:pointer;
+    }
+    .thumb img{
+      width:100%; height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .thumb .fallback{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .meta{
+      padding:10px 10px 10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      flex:1;
+    }
+    .title{
+      font-size:13px;
+      font-weight:800;
+      line-height:1.25;
+      max-height: 2.6em;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      cursor:pointer;
+    }
+    .chips{display:flex;gap:6px;flex-wrap:wrap}
+    .chip{
+      font-size:11px;
+      color:var(--muted);
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.03);
+      max-width:100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    /* Pagination top + bottom */
+    .pager{
+      display:flex;gap:10px;align-items:center;justify-content:center;
+      padding:12px 0 2px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .pager .btn{padding:8px 12px;border-radius:12px}
+    .pagebox{
+      min-width:56px;
+      text-align:center;
+      padding:8px 10px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:12px;
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-size:13px;
+    }
+
+    .empty{
+      padding:20px 10px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .error{
+      padding:14px 12px;
+      border:1px solid rgba(239,68,68,.35);
+      background:rgba(239,68,68,.10);
+      color:#fecaca;
+      border-radius:14px;
+      margin:10px 0;
+      font-size:13px;
+      white-space:pre-wrap;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="header-inner">
+    <div class="pill">FOZE 3D</div>
+    <div class="brand">3D Models</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="panel sidebar">
+    <div class="inner">
+      <input id="q" class="search" placeholder="Search title..." />
+      <div class="row" style="margin-top:8px">
+        <select id="cat" class="select"></select>
+        <select id="sub" class="select"></select>
+      </div>
+
+      <div class="toc-title">Table of contents</div>
+      <div id="toc" class="toc"></div>
+    </div>
+  </aside>
+
+  <main class="panel main">
+    <div class="inner">
+      <div class="controls">
+        <button class="btn" id="clear">Clear filters</button>
+        <button class="btn" id="print">Print / Save as PDF</button>
+        <div class="hint">Click image or title to open the corresponding drive link.</div>
+      </div>
+
+      <div class="pager" id="pagerTop" style="display:none">
+        <button class="btn" id="prevTop">Prev</button>
+        <div class="pagebox" id="pageTop">1</div>
+        <button class="btn" id="nextTop">Next</button>
+      </div>
+
+      <div id="status" class="empty">Loading…</div>
+      <div id="grid" class="grid" style="display:none"></div>
+
+      <div class="pager" id="pagerBottom" style="display:none">
+        <button class="btn" id="prevBottom">Prev</button>
+        <div class="pagebox" id="pageBottom">1</div>
+        <button class="btn" id="nextBottom">Next</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+  // ====== CONFIG ======
+  const PAGE_SIZE = 98; // keep near 100 for speed + layout
+  const DATA_URLS = ["./data.json", "data.json"]; // fallback if one path fails
+
+  // ====== STATE ======
+  let all = [];
+  let filtered = [];
+  let page = 1;
+
+  // ====== DOM ======
+  const $q = document.getElementById("q");
+  const $cat = document.getElementById("cat");
+  const $sub = document.getElementById("sub");
+  const $toc = document.getElementById("toc");
+  const $grid = document.getElementById("grid");
+  const $status = document.getElementById("status");
+
+  const $pagerTop = document.getElementById("pagerTop");
+  const $pagerBottom = document.getElementById("pagerBottom");
+  const $pageTop = document.getElementById("pageTop");
+  const $pageBottom = document.getElementById("pageBottom");
+  const $prevTop = document.getElementById("prevTop");
+  const $nextTop = document.getElementById("nextTop");
+  const $prevBottom = document.getElementById("prevBottom");
+  const $nextBottom = document.getElementById("nextBottom");
+
+  document.getElementById("clear").addEventListener("click", clearFilters);
+  document.getElementById("print").addEventListener("click", () => window.print());
+
+  // ====== HELPERS ======
+  const norm = (s) => (s ?? "").toString().trim();
+  const lower = (s) => norm(s).toLowerCase();
+  const alpha = (a,b) => lower(a).localeCompare(lower(b), undefined, {numeric:true, sensitivity:"base"});
+
+  function safeOpen(url){
+    const u = norm(url);
+    if(!u) return;
+    // ensure opens in new tab; if popups blocked user can click again
+    window.open(u, "_blank", "noopener,noreferrer");
+  }
+
+  function showError(msg){
+    $grid.style.display = "none";
+    $status.style.display = "block";
+    $status.className = "error";
+    $status.textContent = msg;
+  }
+
+  async function loadJSON(){
+    // Try each URL until one works
+    let lastErr = null;
+    for (const u of DATA_URLS){
+      try{
+        const r = await fetch(u, { cache: "force-cache" });
+        if(!r.ok) throw new Error(`HTTP ${r.status} fetching ${u}`);
+        const text = await r.text();
+        // Some people accidentally upload HTML or a GitHub 404 page into data.json
+        if(!text.trim().startsWith("{") && !text.trim().startsWith("[")){
+          throw new Error(`data.json doesn't look like JSON (starts with: ${text.trim().slice(0,30)}…)`);
+        }
+        return JSON.parse(text);
+      }catch(e){
+        lastErr = e;
+      }
+    }
+    throw lastErr ?? new Error("Failed to load data.json");
+  }
+
+  function normalizeItems(raw){
+    // Accept either {items:[...]} or [...]
+    const items = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : []);
+    return items.map((x) => {
+      const title = norm(x.title || x.name);
+      const category = norm(x.category || x.Category);
+      const subcategory = norm(x.subcategory || x.sub_category || x.Subcategory);
+      const drive_link = norm(x.drive_link || x.driveLink || x.drive || x.url_drive);
+      const image_url = norm(x.image_url || x.image || x.thumb || x.thumbnail);
+      return {
+        title,
+        category: category || "Uncategorized",
+        subcategory: subcategory || "Other",
+        drive_link,
+        image_url
+      };
+    });
+  }
+
+  function sortAll(){
+    // Global sort for stable alpha ordering (also improves TOC)
+    all.sort((a,b) => {
+      const c = alpha(a.category, b.category);
+      if(c) return c;
+      const s = alpha(a.subcategory, b.subcategory);
+      if(s) return s;
+      return alpha(a.title, b.title);
+    });
+  }
+
+  function buildDropdowns(){
+    const cats = ["All", ...Array.from(new Set(all.map(x => x.category))).sort(alpha)];
+    $cat.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
+
+    rebuildSubDropdown(); // based on cat selection
+  }
+
+  function rebuildSubDropdown(){
+    const catVal = $cat.value || "All";
+    const subsSet = new Set();
+    for(const x of all){
+      if(catVal !== "All" && x.category !== catVal) continue;
+      subsSet.add(x.subcategory);
+    }
+    const subs = ["All", ...Array.from(subsSet).sort(alpha)];
+    $sub.innerHTML = subs.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
+  }
+
+  function buildTOC(){
+    // Alphabetical categories + subcategories (no counts)
+    const map = new Map(); // cat -> Set(subs)
+    for(const x of all){
+      if(!map.has(x.category)) map.set(x.category, new Set());
+      map.get(x.category).add(x.subcategory);
+    }
+
+    const cats = Array.from(map.keys()).sort(alpha);
+    $toc.innerHTML = cats.map(cat => {
+      const subs = Array.from(map.get(cat)).sort(alpha);
+      const subsHtml = subs.map(sub =>
+        `<button class="subbtn" data-cat="${escapeAttr(cat)}" data-sub="${escapeAttr(sub)}">${escapeHtml(sub)}</button>`
+      ).join("");
+      return `
+        <details>
+          <summary>${escapeHtml(cat)}</summary>
+          <div class="subs">${subsHtml}</div>
+        </details>
+      `;
+    }).join("");
+
+    $toc.querySelectorAll(".subbtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const c = btn.getAttribute("data-cat");
+        const s = btn.getAttribute("data-sub");
+        $cat.value = c;
+        rebuildSubDropdown();
+        $sub.value = s;
+        page = 1;
+        applyFilters();
+        // scroll to top of grid area
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+  }
+
+  function escapeHtml(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;").replaceAll("<","&lt;")
+      .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function escapeAttr(s){
+    // safe for data- attrs; still escape quotes
+    return escapeHtml(s).replaceAll("`","&#096;");
+  }
+
+  function applyFilters(){
+    const q = lower($q.value);
+    const catVal = $cat.value || "All";
+    const subVal = $sub.value || "All";
+
+    filtered = all.filter(x => {
+      if(catVal !== "All" && x.category !== catVal) return false;
+      if(subVal !== "All" && x.subcategory !== subVal) return false;
+      if(q){
+        const t = lower(x.title);
+        return t.includes(q);
+      }
+      return true;
+    });
+
+    // Keep alpha within filtered results
+    filtered.sort((a,b) => alpha(a.title, b.title));
+
+    // Clamp page
+    const pages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    page = Math.min(page, pages);
+
+    render();
+  }
+
+  function render(){
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const start = (page - 1) * PAGE_SIZE;
+    const slice = filtered.slice(start, start + PAGE_SIZE);
+
+    // Pager
+    const showPager = totalPages > 1;
+    $pagerTop.style.display = showPager ? "flex" : "none";
+    $pagerBottom.style.display = showPager ? "flex" : "none";
+    $pageTop.textContent = String(page);
+    $pageBottom.textContent = String(page);
+
+    const canPrev = page > 1;
+    const canNext = page < totalPages;
+    [$prevTop,$prevBottom].forEach(b => b.disabled = !canPrev);
+    [$nextTop,$nextBottom].forEach(b => b.disabled = !canNext);
+
+    // Empty
+    if(slice.length === 0){
+      $grid.style.display = "none";
+      $status.style.display = "block";
+      $status.className = "empty";
+      $status.textContent = "No items match your filters.";
+      return;
+    }
+
+    // Build HTML in one pass (fast)
+    const html = slice.map(x => {
+      const hasImg = !!x.image_url;
+      const img = hasImg
+        ? `<img loading="lazy" decoding="async" src="${escapeAttr(x.image_url)}" alt="${escapeHtml(x.title)}">`
+        : `<div class="fallback">No image</div>`;
+      return `
+        <div class="card">
+          <div class="thumb" data-drive="${escapeAttr(x.drive_link)}" title="Open file">
+            ${img}
+          </div>
+          <div class="meta">
+            <div class="title" data-drive="${escapeAttr(x.drive_link)}" title="Open file">${escapeHtml(x.title)}</div>
+            <div class="chips">
+              <span class="chip">${escapeHtml(x.category)}</span>
+              <span class="chip">${escapeHtml(x.subcategory)}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    $status.style.display = "none";
+    $grid.style.display = "grid";
+    $grid.innerHTML = html;
+
+    // Click handlers (image + title)
+    $grid.querySelectorAll("[data-drive]").forEach(el => {
+      el.addEventListener("click", () => {
+        const link = el.getAttribute("data-drive");
+        if(link) safeOpen(link);
+      });
+    });
+  }
+
+  function clearFilters(){
+    $q.value = "";
+    $cat.value = "All";
+    rebuildSubDropdown();
+    $sub.value = "All";
+    page = 1;
+    applyFilters();
+  }
+
+  // Debounce search for speed
+  function debounce(fn, ms){
+    let t = null;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), ms);
+    };
+  }
+
+  // Pager buttons
+  function goPrev(){ if(page > 1){ page--; render(); window.scrollTo({top:0, behavior:"smooth"});} }
+  function goNext(){
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if(page < totalPages){ page++; render(); window.scrollTo({top:0, behavior:"smooth"}); }
+  }
+
+  $prevTop.addEventListener("click", goPrev);
+  $prevBottom.addEventListener("click", goPrev);
+  $nextTop.addEventListener("click", goNext);
+  $nextBottom.addEventListener("click", goNext);
+
+  $q.addEventListener("input", debounce(() => { page=1; applyFilters(); }, 160));
+  $cat.addEventListener("change", () => { rebuildSubDropdown(); page=1; applyFilters(); });
+  $sub.addEventListener("change", () => { page=1; applyFilters(); });
+
+  // ====== INIT ======
+  (async function init(){
+    try{
+      const raw = await loadJSON();
+      all = normalizeItems(raw);
+      sortAll();
+      buildDropdowns();
+      buildTOC();
+
+      // Default: show everything immediately (no "clear filters" needed)
+      filtered = [...all];
+      applyFilters();
+    }catch(e){
+      showError(
+        "Failed to load data.json.\n\n" +
+        "Fix checklist:\n" +
+        "1) data.json and index.html must be in the SAME repo folder (root).\n" +
+        "2) GitHub Pages must be set to main / (root).\n" +
+        "3) data.json must be valid JSON (not a 404 HTML page).\n\n" +
+        "Details: " + (e && e.message ? e.message : String(e))
+      );
+    }
+  })();
+})();
+</script>
+</body>
+</html>
